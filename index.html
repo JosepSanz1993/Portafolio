@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<!-- flag{el_codigo_fuente_siempre_primero} -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Josep Sanz — Pentester</title>
+<meta name="description" content="Josep Sanz Gallego — Pentester / Red Team Junior. Hacking ético, pentesting de redes, sistemas y Active Directory.">
+<meta property="og:title" content="Josep Sanz Gallego — Pentester / Red Team Junior">
+<meta property="og:description" content="Portafolio interactivo: pentesting, Red Team, Active Directory y laboratorios propios.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23141013'/><text x='50' y='66' text-anchor='middle' font-family='monospace' font-size='52' fill='%23ff4b4e'>&gt;_</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* VOICE: operador Red Team en plena sesión autorizada; tenso, preciso, con humor de CTF.
+   IDEA: consola de mando de un equipo ofensivo: HUD, lluvia de código y fósforo rojo.
+   PICTURE: la ventana-terminal con esquinas HUD sobre una lluvia de hex/katakana roja.
+   COLOUR and TYPE: negro casi puro, rojo señal #ff2a3d con brillo, verde solo para "OK"; VT323 + Share Tech Mono.
+   LAYOUT: ticker superior, ventana central de 1100px, todo apilado bajo 600px. */
+:root{color-scheme:dark;--page:#040203;--scr:rgba(10,3,5,.86);--txt:#f2dede;--dim:#a88a8d;--red:#ff2a3d;--red2:#b3001b;--ok:#39ff88;--line:#4a1018;--glow:0 0 6px rgba(255,42,61,.75),0 0 18px rgba(255,42,61,.35)}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:20px;background:var(--page)}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#2a0509 0,#040203 60%) fixed;color:var(--txt);font:15px/1.6 "Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;overflow-x:clip;min-height:100vh}
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.7) 100%)}
+a{color:var(--red);text-underline-offset:3px}a:hover{color:#fff;text-shadow:var(--glow)}
+:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
+::selection{background:var(--red);color:#000}
+.ticker{position:relative;z-index:2;overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--line);background:rgba(20,0,4,.85);color:var(--red);font:17px/30px "VT323",monospace;letter-spacing:.04em}
+.ticker span{display:inline-block;padding-left:100%;animation:tk 38s linear infinite}
+@keyframes tk{to{transform:translateX(-100%)}}
+.wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:clamp(14px,3vw,34px) max(3vw,12px) 40px}
+.win{position:relative;background:rgba(8,2,4,.9);border:1px solid var(--red2);box-shadow:0 0 0 1px #000,0 0 40px -6px rgba(255,42,61,.45),inset 0 0 60px rgba(255,0,30,.06)}
+.hud{position:absolute;width:22px;height:22px;border:2px solid var(--red);pointer-events:none;filter:drop-shadow(0 0 4px var(--red))}
+.hud.a{top:-6px;left:-6px;border-right:0;border-bottom:0}.hud.b{top:-6px;right:-6px;border-left:0;border-bottom:0}
+.hud.c{bottom:-6px;left:-6px;border-right:0;border-top:0}.hud.d{bottom:-6px;right:-6px;border-left:0;border-top:0}
+.bar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);color:var(--dim);font-size:13px;background:rgba(30,2,8,.6)}
+.rec{width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:bl 1.2s steps(1) infinite}
+.bar .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar .t b{color:var(--red);font-weight:400}
+.bar .s{color:var(--ok);white-space:nowrap}
+.tabs{display:flex;flex-wrap:wrap;gap:2px 4px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tabs button{all:unset;box-sizing:border-box;cursor:pointer;min-height:40px;padding:6px 10px;font:20px/1.4 "VT323",monospace;color:var(--dim)}
+.tabs button::before{content:"[ ";color:var(--line)}.tabs button::after{content:" ]";color:var(--line)}
+.tabs button:hover{color:#fff}
+.tabs button[aria-current=page]{color:var(--red);text-shadow:var(--glow)}
+.tabs button[aria-current=page]::before,.tabs button[aria-current=page]::after{color:var(--red)}
+.tabs button:focus-visible{outline:2px solid var(--ok);outline-offset:-2px}
+.screen{position:relative;min-height:560px;padding:clamp(18px,3vw,34px);overflow:hidden}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,40,60,.05) 0 1px,transparent 1px 3px);animation:fl 6s infinite}
+@keyframes fl{0%,100%{opacity:1}48%{opacity:.85}50%{opacity:.6}52%{opacity:.9}}
+.screen.flat::after{display:none}
+.banner{margin:0 0 6px;color:var(--red);text-shadow:var(--glow);font:11px/1.05 ui-monospace,Menlo,monospace;white-space:pre;overflow:hidden}
+h1{position:relative;font:400 clamp(46px,8vw,84px)/.95 "VT323",monospace;margin:4px 0 8px;color:#fff;text-shadow:0 0 10px rgba(255,42,61,.8);text-wrap:balance}
+.gl::before,.gl::after{content:attr(data-t);position:absolute;inset:0;pointer-events:none}
+.gl::before{color:#0ff;opacity:.55;transform:translate(-2px,0);clip-path:inset(0 0 65% 0);animation:g1 3.2s infinite steps(2)}
+.gl::after{color:var(--red);transform:translate(2px,0);clip-path:inset(60% 0 0 0);animation:g2 2.7s infinite steps(2)}
+@keyframes g1{0%,86%,100%{transform:none;opacity:0}88%{transform:translate(-4px,-1px);opacity:.7}92%{transform:translate(3px,1px);opacity:.6}}
+@keyframes g2{0%,80%,100%{transform:none;opacity:0}82%{transform:translate(4px,1px);opacity:.9}90%{transform:translate(-3px,0);opacity:.8}}
+h2{font:400 clamp(30px,4vw,42px)/1.05 "VT323",monospace;margin:0 0 18px;color:var(--red);text-shadow:var(--glow)}
+h2::before{content:"# ";color:var(--dim);text-shadow:none}
+h3{font:400 25px/1.1 "VT323",monospace;margin:0 0 6px;color:#fff}
+.ps{font:21px "VT323",monospace;color:var(--dim);margin:0}.ps b{color:var(--red);font-weight:400;text-shadow:var(--glow)}
+.role{font:25px/1.2 "VT323",monospace;margin:0 0 20px;color:var(--red);text-shadow:var(--glow)}
+.cur{display:inline-block;width:14px;height:.72em;background:var(--red);box-shadow:var(--glow);margin-left:8px;vertical-align:-.04em;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+p{max-width:70ch;margin:0 0 12px}
+.muted{color:var(--dim)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 16px}
+.w,.card,details{position:relative;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,42,61,.06),rgba(255,42,61,.01))}
+.w{padding:12px 14px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.w b{display:block;font:19px "VT323",monospace;font-weight:400;color:var(--dim)}
+.w .big{display:block;font:38px/1 "VT323",monospace;color:#fff;white-space:nowrap;text-shadow:0 0 8px rgba(255,42,61,.6)}
+.w small{display:block;color:var(--dim);font-size:13px}
+.led{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);margin-right:8px;vertical-align:.1em}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;min-height:42px;padding:4px 16px;border:1px solid var(--red);color:var(--red);font:21px/1 "VT323",monospace;text-decoration:none;background:rgba(255,42,61,.06);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);transition:background .15s,color .15s}
+.btn:hover{background:var(--red);color:#000;text-shadow:none}
+.btn:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
+.term{border:1px solid var(--line);background:rgba(0,0,0,.65);padding:12px 14px;font:20px/1.3 "VT323",monospace;height:250px;overflow-y:auto;cursor:text;box-shadow:inset 0 0 30px rgba(255,0,30,.08)}
+.term pre{margin:0;white-space:pre-wrap;font:inherit;color:var(--txt);overflow-wrap:anywhere}
+.term .in{display:flex;gap:8px;align-items:center}
+.term label{color:var(--red);flex:none;text-shadow:var(--glow)}
+.term input{all:unset;flex:1;min-width:0;color:#fff;font:inherit;font-size:20px;caret-color:var(--red)}
+.term .e{color:var(--red)}.term .g{color:var(--ok)}
+details{margin:0 0 10px}
+summary{cursor:pointer;list-style:none;padding:10px 14px;font:24px "VT323",monospace;color:#fff;min-height:44px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"[+] ";color:var(--red)}details[open]>summary::before{content:"[-] ";color:var(--red)}
+details>div{padding:0 14px 14px}
+.arch{margin:10px 0;padding:10px 12px;border:1px dashed var(--line);background:rgba(0,0,0,.6);color:#ff8f99;font:12px/1.35 ui-monospace,Menlo,monospace;overflow-x:auto;white-space:pre}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tags span{border:1px solid var(--line);color:var(--txt);background:rgba(255,42,61,.08);padding:1px 8px;font-size:12px}
+.row{display:grid;grid-template-columns:230px minmax(0,1fr);gap:4px 18px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.row dt{font:22px/1.15 "VT323",monospace;color:var(--red)}.row dd{margin:0}
+.tl{border-left:1px solid var(--red2);padding-left:18px;margin-left:6px}
+.job{position:relative;margin:0 0 22px}
+.job::before{content:"";position:absolute;left:-25px;top:8px;width:11px;height:11px;background:var(--red);box-shadow:var(--glow);transform:rotate(45deg)}
+.job .when{font-size:13px;color:var(--ok);white-space:nowrap}
+.job ul{margin:6px 0 0;padding-left:0;list-style:none}.job li{margin:0 0 4px;max-width:70ch;padding-left:22px;text-indent:-22px}.job li::before{content:"[*] ";color:var(--red)}
+.bars{margin:0 0 20px}
+.br{display:grid;grid-template-columns:80px minmax(0,1fr) 44px;gap:10px;align-items:center;margin:0 0 8px;font-size:14px}
+.br i{display:block;height:14px;background:repeating-linear-gradient(90deg,var(--red) 0 8px,transparent 8px 10px);box-shadow:0 0 10px rgba(255,42,61,.5)}
+.br i.m{background:repeating-linear-gradient(90deg,#ff7a45 0 8px,transparent 8px 10px)}.br i.d{background:repeating-linear-gradient(90deg,#ffd166 0 8px,transparent 8px 10px)}
+.br span:last-child{text-align:right;color:#fff}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{padding:14px;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:var(--red);box-shadow:0 0 18px -4px rgba(255,42,61,.6)}
+.card .lv{font-size:12px;color:#000;background:var(--red);padding:0 6px;display:inline-block;margin-bottom:6px}
+.card .lv.d{background:#ffd166}.card .lv.m{background:#ff7a45}
+.dots{color:var(--red);letter-spacing:2px;text-shadow:var(--glow)}
+.boot{font:21px/1.4 "VT323",monospace;white-space:pre-wrap;margin:0;color:var(--txt)}
+.boot .k{color:var(--ok)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+.foot button{all:unset;cursor:pointer;color:var(--red);text-decoration:underline;text-underline-offset:3px;padding:6px 0}
+.toast{color:var(--ok);font-size:13px;margin-left:8px}
+noscript{display:block;max-width:720px;margin:24px auto;padding:20px;background:#0a0305;color:var(--txt)}
+@media(max-width:760px){.grid3,.two{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.screen{min-height:480px}.tabs button{font-size:18px;padding:6px 4px}.term{height:220px;font-size:18px}.bar .s{display:none}.banner{display:none}}
+@media(prefers-reduced-motion:reduce){.cur,.rec,.led,.ticker span,.screen::after,.gl::before,.gl::after{animation:none}.gl::before,.gl::after{display:none}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="ticker" aria-hidden="true"><span>[+] ENGAGEMENT AUTORIZADO · SCOPE VERIFICADO · RoE FIRMADAS &nbsp;&nbsp;//&nbsp;&nbsp; [*] OPERADOR: JOSEP SANZ · CEH · PENTESTER / RED TEAM &nbsp;&nbsp;//&nbsp;&nbsp; [!] RECON → INITIAL ACCESS → PRIVESC → LATERAL MOVEMENT → DOMAIN ADMIN → REPORT &nbsp;&nbsp;//&nbsp;&nbsp; [+] 59 MÁQUINAS COMPROMETIDAS Y DOCUMENTADAS &nbsp;&nbsp;//&nbsp;&nbsp; [*] HACK THE PLANET... CON PERMISO POR ESCRITO</span></div>
+<main class="wrap">
+  <div class="win">
+    <i class="hud a"></i><i class="hud b"></i><i class="hud c"></i><i class="hud d"></i>
+    <div class="bar" aria-hidden="true"><span class="rec"></span><span class="t"><b>root@redteam</b>:~/portafolio — sesión cifrada · tun0 10.10.14.37</span><span class="s">● C2 ONLINE</span></div>
+    <nav class="tabs" id="tabs" aria-label="Secciones"></nav>
+    <div class="screen" id="scr" aria-live="polite"></div>
+    <div class="foot"><span>© 2026 Josep Sanz Gallego · Tarragona, España</span><span><button id="crt" type="button">CRT on/off</button> · <button id="reboot" type="button">reiniciar</button></span></div>
+  </div>
+</main>
+
+<noscript>
+  <h1>Josep Sanz Gallego</h1>
+  <p>Pentester / Red Team Junior · Hacking Ético &amp; Seguridad Ofensiva · Tarragona, España</p>
+  <p>Email: bsanzgallego@gmail.com</p>
+  <p><a href="https://github.com/JosepSanz1993">GitHub</a> · <a href="https://www.linkedin.com/in/josep-sanz-gallego-956b982a3/">LinkedIn</a> · <a href="CV_Josep_Sanz_Ciberseguridad.pdf">CV (PDF)</a></p>
+</noscript>
+
+<script>
+{
+const D={
+  email:"bsanzgallego@gmail.com",
+  gh:"https://github.com/JosepSanz1993",
+  li:"https://www.linkedin.com/in/josep-sanz-gallego-956b982a3/",
+  cv:"CV_Josep_Sanz_Ciberseguridad.pdf",
+  repo:"https://github.com/JosepSanz1993/CIBERSEGURIDAD",
+  about:[
+    "Soy Ingeniero Informático (URV) con doble máster en ciberseguridad —el Máster Universitario en Ciberseguridad y Privacidad de la UOC y el Máster Executive en Ciberseguridad y Hacking Ético de INTECSSA— y certificación CEH.",
+    "Me especializo en pentesting de redes, sistemas y Active Directory: reconocimiento, enumeración, explotación, escalada de privilegios y, sobre todo, documentar cada hallazgo en un informe que el equipo de IT pueda accionar y que dirección pueda entender.",
+    "Vengo del soporte técnico en entornos críticos (justicia y centros penitenciarios) y de la docencia en DAW, ASIR y SMR. Eso me ha dado dos cosas que uso a diario: rigor operativo y la capacidad de explicar lo técnico en lenguaje de negocio.",
+    "Busco mi primer puesto como Pentester o Red Team Junior. Trabajo siempre dentro de un alcance autorizado: el permiso por escrito es lo que separa a un profesional de un atacante."
+  ],
+  projects:[
+    {t:"Nexora Solutions — Proyecto final Red Team",d:"Infraestructura corporativa simulada para ejercicios de pentesting y Red Team: firewall Ubuntu, Rocky Linux, contenedores Alpine/Docker, DMZ y SIEM en RHEL, con servicios FTP, SMTP, LDAP, SNMP, SMB y web. Incluye scripts de despliegue, hardening, diagramas de movimiento lateral y la documentación completa del proyecto.",tags:["Docker","Red Hat / Rocky","SIEM","LDAP","SNMP","SMB","Hardening","Bash"],url:"/tree/main/Nexora%20Solutions",arch:"[Atacante] -> [Firewall Ubuntu] -> [DMZ: Web · FTP · SMTP]\n                         |\n                 [Red interna: LDAP · SNMP · SMB] -> [SIEM RHEL]"},
+    {t:"DMZ Pentest Lab — Movimiento lateral",d:"Laboratorio Docker autocontenido que simula una DMZ con tres distribuciones Linux distintas. Practica una cadena realista: punto de entrada web, reutilización de credenciales y pivoting hasta comprometer un recurso compartido interno. Con walkthrough, guía de troubleshooting y CI en GitHub Actions.",tags:["Docker Compose","Apache","PostgreSQL","SSH/FTP","Samba","Pivoting","CI"],url:"/tree/main/dmz-pentest-lab",arch:"          Red DMZ aislada · 172.30.0.0/24\n ubuntu-web          fedora-ssh          opensuse-smb\n 172.30.0.10         172.30.0.20         172.30.0.30\n Apache :80          SSH :22             Samba :445\n Postgres :5432      FTP :21\n      ^\n [Kali / Parrot] --- entrada web -> credenciales -> pivot -> SMB"},
+    {t:"Laboratorio de Pentesting Web con Docker",d:"Entorno reproducible para recorrer la cadena completa contra un servidor web Linux: enumeración, explotación, foothold, escalada de privilegios y root. Incluye una máquina vulnerable propia, DVWA y OWASP Juice Shop en una red aislada, con puertos publicados solo en 127.0.0.1.",tags:["Docker","OWASP Top 10","DVWA","Juice Shop","Burp Suite","Makefile"],url:"/tree/main/lab-pentesting-web-docker",arch:"        Red Docker aislada · labnet 172.30.0.0/24\n vulnerable-web       DVWA             Juice Shop\n 172.30.0.10:8000     172.30.0.11:8080 172.30.0.12:3000\n            \\________ 127.0.0.1 ________/\n                       |\n                [Host / Kali atacante]"},
+    {t:"CAPTURE THE FLAG",d:"Repositorio de retos CTF resueltos, scripts y herramientas propias para automatizar tareas habituales: seguridad web, reversing, criptografía, forense, OSINT y escalada de privilegios.",tags:["Python","Bash","PowerShell","Dockerfile","Reversing","OSINT"],full:"https://github.com/JosepSanz1993/CAPTURE_THE_FLAG"}
+  ],
+  levels:[["Fácil",45,""],["Medio",11,"m"],["Difícil",3,"d"]],
+  reports:[
+    ["Difícil","d","EL POZO","Listado de directorios con información sensible y credenciales débiles; después, escape de una shell restringida y un SUID innecesario (nl) para leer ficheros como root y robar una clave SSH.","Dificil/EL_POZO.pdf"],
+    ["Difícil","d","LISTENER","Cadena de cuatro debilidades críticas que arranca en un panel de administración con credenciales previsibles y termina en compromiso total como root.","Dificil/Informe_Pentest_LISTENER.pdf"],
+    ["Difícil","d","LINUXLAB","Wargame de 18 niveles encadenados (estilo Bandit) resuelto de principio a fin, cerrado con dos escaladas locales: un binario SUID y un script world-writable ejecutado por root.","Dificil/Informe_Pentesting_LINUXLAB.pdf"],
+    ["Medio","m","ARMAGEDDON","RCE sin autenticación en Drupal 7 (Drupalgeddon2, CVE-2018-7600) y escalada final por una regla sudo que permitía ejecutar find como root sin contraseña.","Medio/Informe_Pentesting_ARMAGEDDON.pdf"],
+    ["Medio","m","GHOSTLAB","Hash MD5 débil publicado en la web que daba acceso SSH; luego, una copia de tee disfrazada con bit SUID para escribir ficheros arbitrarios como root.","Medio/Informe_Pentesting_GHOSTLAB.pdf"],
+    ["Medio","m","SNMPWN","Servicio SNMP mal configurado que filtraba una credencial en la línea de comandos de un proceso, sin necesidad de fuerza bruta.","Medio/Informe_Pentesting_SNMPWN.pdf"],
+    ["Medio","m","UNIVERSITY ESCAPE","Sin exploits complejos: diccionario contra SSH y un usuario con sudo total. Las malas configuraciones que más se ven en entornos reales.","Medio/Informe_Pentesting_University-Escape.pdf"],
+    ["Medio","m","SUPERHERO","Compromiso total del host hasta root en muy poco tiempo y sin credenciales previas, con evaluación de impacto y post-explotación.","Medio/Informe_Pentesting_SUPERHERO.pdf"]
+  ],
+  jobs:[
+    {r:"Profesor de Informática — Software Development, Networks & Systems",c:"Generalitat de Catalunya · Departament d'Educació",w:"02/2024 – actualidad",l:["Docencia de programación, desarrollo de software, redes y administración de sistemas en ciclos de DAW, ASIR y SMR.","Formación en Java, JavaScript, HTML5, CSS3, XML y JSON.","Redes y servicios de infraestructura: DHCP, DNS, POP3/IMAP, HTTP/HTTPS y acceso remoto.","Diseño de contenidos y prácticas orientadas a entornos profesionales IT."]},
+    {r:"Técnico Microinformático",c:"Sermicro S.A. · Centro Penitenciario El Catllar (Tarragona)",w:"02/2025 – 09/2025",l:["Gestión de más de 100 activos TIC en un entorno de alta seguridad.","Maquetado (imaging) y administración de hardware para 500 equipos de funcionarios e internos.","Resolución de más de 50 incidencias de hardware vía ticketing e infraestructura de impresión (40 impresoras)."]},
+    {r:"Técnico de Campo",c:"Inet Smart ITC Services · Juzgados de Tarragona",w:"10/2024 – 02/2025",l:["Soporte y mantenimiento para 1.000 usuarios VIP en la administración de justicia.","Instalación y configuración de más de 1.000 puestos, con informes que mejoraron la trazabilidad un 25%."]}
+  ],
+  edu:[
+    ["Máster Universitario en Ciberseguridad y Privacidad","Universitat Oberta de Catalunya (UOC) · 2024 – 2026 · Título oficial. Pentesting, análisis forense y hacking ético."],
+    ["Máster Executive en Ciberseguridad y Hacking Ético","INTECSSA · finalizado en 2026 · 850 h / 34 ECTS. Auditoría, pentesting, hacking web y cloud, hardening."],
+    ["Grado en Ingeniería Informática","Universitat Rovira i Virgili (URV) · 2016 – 2024 · Tarragona"],
+    ["CFGS ASIR · CFGM SMR","IES Montsià · Amposta · ASIR 2014 – 2016 · SMR 2010 – 2012"]
+  ],
+  certs:[["CEH — Certified Ethical Hacker","TechBizAcademy"],["CCST Cybersecurity","Cisco"],["Certified Cybersecurity Foundations","Hackviser"],["IT Specialist — Cybersecurity","Certiport · Pearson VUE"],["Introduction to Cybersecurity","Cisco"]],
+  skills:[
+    ["Pentesting y explotación","Kali Linux · Metasploit · Nmap / NSE · Active Directory · Nessus · escalada de privilegios · post-explotación · metodología de pentest · MITRE ATT&CK"],
+    ["Hacking web","Burp Suite · OWASP ZAP · sqlmap · Nikto · inyección SQL · XSS · OWASP Top 10 · hacking de bases de datos"],
+    ["Reconocimiento y OSINT","OSINT · Wireshark · enumeración de SMB, LDAP, Kerberos y DNS"],
+    ["Hardening y defensa","iptables / firewalls · OpenVPN · BitLocker · hardening de Windows Server · ISO 27001 / SGSI"],
+    ["Redes y sistemas","Windows Server 2008–2016 · Windows 10/11 · Directorio Activo · Unix / Linux · TCP/IP, DNS, DHCP · RDP / WinRS · Nagios"],
+    ["Virtualización","VMware · Hyper-V · VirtualBox · Proxmox · Docker"],
+    ["Programación","Python · PowerShell · Bash · Java · C / C++ · JavaScript · HTML / CSS · SQL (SQL Server, MySQL) · Jupyter"]
+  ],
+  soft:["Mentalidad ofensiva: pensar como un atacante","Ética profesional en entornos sensibles","Comunicación clara: de lo técnico al negocio","Rigor metodológico y atención al detalle","Documentación organizada y constante","Trabajo en equipo y habilidades docentes"],
+  langs:[["Español","Nativo",5],["Catalán","Nativo",5],["Inglés","B2",3]]
+};
+const BANNER=String.raw`
+ ____  _____ ____    _____ _____    _    __  __
+|  _ \| ____|  _ \  |_   _| ____|  / \  |  \/  |
+| |_) |  _| | | | |   | | |  _|   / _ \ | |\/| |
+|  _ <| |___| |_| |   | | | |___ / ___ \| |  | |
+|_| \_\_____|____/    |_| |_____/_/   \_\_|  |_|  // hacking ético`;
+const TOTAL=D.levels.reduce((a,l)=>a+l[1],0);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const ext=(u,x)=>`<a href="${u}" target="_blank" rel="noopener">${esc(x||u)}</a>`;
+const FLAGS=new Set(["flag{el_codigo_fuente_siempre_primero}","flag{recruiter_detectado_hablemos}","flag{root_en_el_portafolio}"]);
+const found=new Set();let clock=null;const hist=[];let hi=-1;
+
+const V={
+  inicio:()=>`<pre class="banner" aria-hidden="true">${esc(BANNER)}</pre>
+  <p class="ps"><b>root@redteam</b>:~# ./operador.sh --perfil</p>
+  <h1 class="gl" data-t="Josep Sanz Gallego">Josep Sanz Gallego<span class="cur" aria-hidden="true"></span></h1>
+  <p class="role">Pentester / Red Team Junior · Hacking Ético &amp; Seguridad Ofensiva</p>
+  <div class="grid3">
+    <div class="w"><b>hora local · Tarragona</b><span class="big" id="clk">--:--:--</span><small id="dt"></small></div>
+    <div class="w"><b>estado</b><span class="big"><i class="led"></i>disponible</span><small>Pentester / Red Team Junior · España o remoto</small></div>
+    <div class="w"><b>informes de pentest</b><span class="big">${TOTAL}</span><small>máquinas comprometidas y documentadas</small></div>
+  </div>
+  <div class="btns">
+    <a class="btn" href="#proyectos">Proyectos</a>
+    <a class="btn" href="#informes">Informes</a>
+    <a class="btn" href="${D.cv}" target="_blank" rel="noopener">CV (PDF)</a>
+    <a class="btn" href="${D.li}" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="btn" href="${D.gh}" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <div class="term" id="term"><pre id="out">Escribe <span class="g">help</span> para ver los comandos. ¿Curioso? Hay 3 flags escondidas en este portafolio.</pre><div class="in"><label for="cmd">root@redteam:~#</label><input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal"></div></div>`,
+  "sobre-mi":()=>`<h2>cat sobre_mi.txt</h2>${D.about.map(t=>`<p>${esc(t)}</p>`).join("")}
+  <h3 style="margin-top:22px">Cómo trabajo</h3><div class="tags">${D.soft.map(s=>`<span>${esc(s)}</span>`).join("")}</div>`,
+  proyectos:()=>`<h2>ls proyectos/</h2><p class="muted">Laboratorios propios, todos desplegados en redes aisladas y documentados en ${ext(D.repo,"GitHub")}.</p>${D.projects.map((p,i)=>`<details ${i?"":"open"}><summary>${esc(p.t)}</summary><div><p>${esc(p.d)}</p>${p.arch?`<pre class="arch" aria-label="Arquitectura">${esc(p.arch)}</pre>`:""}<div class="tags">${p.tags.map(x=>`<span>${esc(x)}</span>`).join("")}</div><a class="btn" href="${p.full||D.repo+p.url}" target="_blank" rel="noopener">Ver en GitHub</a></div></details>`).join("")}`,
+  informes:()=>`<h2>ls informes/ | wc -l → ${TOTAL}</h2>
+  <p>Cada máquina resuelta termina en un informe profesional: resumen ejecutivo, cadena de ataque, evidencias, criticidad y remediación. Estos son de laboratorios y plataformas que autorizan el ataque.</p>
+  <div class="bars" role="list">${D.levels.map(l=>`<div class="br" role="listitem"><span>${l[0]}</span><i class="${l[2]}" style="width:${(l[1]/45*100).toFixed(1)}%"></i><span>${l[1]}</span></div>`).join("")}</div>
+  <div class="two">${D.reports.map(r=>`<article class="card"><span class="lv ${r[1]}">${esc(r[0])}</span><h3>${esc(r[2])}</h3><p>${esc(r[3])}</p><a href="${D.repo}/blob/main/Labs-Hack/${r[4]}" target="_blank" rel="noopener">Leer informe (PDF)</a></article>`).join("")}</div>
+  <p style="margin-top:16px"><a class="btn" href="${D.repo}/tree/main/Labs-Hack" target="_blank" rel="noopener">Ver los ${TOTAL} informes</a></p>`,
+  experiencia:()=>`<h2>history | experiencia</h2><div class="tl">${D.jobs.map(j=>`<div class="job"><h3>${esc(j.r)}</h3><div class="muted">${esc(j.c)} · <span class="when">${esc(j.w)}</span></div><ul>${j.l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`,
+  formacion:()=>`<h2>cat formacion.txt</h2><dl style="margin:0 0 26px">${D.edu.map(e=>`<div class="row"><dt>${esc(e[0])}</dt><dd>${esc(e[1])}</dd></div>`).join("")}</dl>
+  <h2>ls certificaciones/</h2><div class="two">${D.certs.map(c=>`<div class="card"><h3>${esc(c[0])}</h3><span class="muted">${esc(c[1])}</span></div>`).join("")}</div>`,
+  skills:()=>`<h2>dpkg -l | arsenal</h2><dl style="margin:0 0 26px">${D.skills.map(s=>`<div class="row"><dt>${esc(s[0])}</dt><dd>${esc(s[1])}</dd></div>`).join("")}</dl>
+  <h2>locale -a</h2><dl style="margin:0">${D.langs.map(l=>`<div class="row"><dt>${esc(l[0])}</dt><dd>${esc(l[1])} <span class="dots" aria-hidden="true">${"●".repeat(l[2])}${"○".repeat(5-l[2])}</span></dd></div>`).join("")}</dl>`,
+  contacto:()=>`<h2>./contacto.sh</h2><p>¿Tienes una vacante de pentesting o Red Team, un proyecto de auditoría o un equipo de CTF? Escríbeme.</p>
+  <dl style="margin:0 0 18px">
+    <div class="row"><dt>Email</dt><dd><a href="mailto:${D.email}">${D.email}</a> <button class="btn" id="copy" type="button" style="margin-left:8px">Copiar</button><span class="toast" id="toast" role="status"></span></dd></div>
+    <div class="row"><dt>LinkedIn</dt><dd>${ext(D.li,"in/josep-sanz-gallego-956b982a3")}</dd></div>
+    <div class="row"><dt>GitHub</dt><dd>${ext(D.gh,"github.com/JosepSanz1993")}</dd></div>
+    <div class="row"><dt>Ubicación</dt><dd>Tarragona, España · abierto a remoto e híbrido</dd></div>
+    <div class="row"><dt>CV</dt><dd><a href="${D.cv}" target="_blank" rel="noopener">CV_Josep_Sanz_Ciberseguridad.pdf</a></dd></div>
+  </dl>`
+};
+const NAV=[["inicio","inicio"],["sobre-mi","sobre_mí"],["proyectos","proyectos"],["informes","informes"],["experiencia","experiencia"],["formacion","formación"],["skills","skills"],["contacto","contacto"]];
+const tabs=document.getElementById("tabs"),scr=document.getElementById("scr");
+tabs.innerHTML=NAV.map(n=>`<button type="button" data-n="${n[0]}">${n[1]}</button>`).join("");
+tabs.addEventListener("click",ev=>{const b=ev.target.closest("button");if(b)location.hash=b.dataset.n});
+document.getElementById("crt").addEventListener("click",()=>scr.classList.toggle("flat"));
+document.getElementById("reboot").addEventListener("click",()=>{try{sessionStorage.removeItem("booted")}catch(e){}boot(true)});
+
+function show(){
+  const n=V[location.hash.slice(1)]?location.hash.slice(1):"inicio";
+  clearInterval(clock);
+  scr.innerHTML=V[n]();
+  tabs.querySelectorAll("button").forEach(b=>b.dataset.n===n?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  if(n==="inicio")home();
+  if(n==="contacto")contact();
+}
+function contact(){
+  const b=document.getElementById("copy"),t=document.getElementById("toast");
+  b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(D.email);t.textContent="copiado ✓"}catch(e){t.textContent="selecciona y copia el email"}setTimeout(()=>t.textContent="",2000)});
+}
+function home(){
+  const c=document.getElementById("clk"),d=document.getElementById("dt");
+  const tick=()=>{const t=new Date();try{c.textContent=t.toLocaleTimeString("es-ES",{timeZone:"Europe/Madrid"});d.textContent=t.toLocaleDateString("es-ES",{timeZone:"Europe/Madrid",weekday:"long",day:"numeric",month:"long",year:"numeric"})}catch(e){c.textContent=t.toLocaleTimeString()}};
+  tick();clock=setInterval(tick,1000);
+  const term=document.getElementById("term"),out=document.getElementById("out"),inp=document.getElementById("cmd");
+  term.addEventListener("click",ev=>{if(ev.target.tagName!=="A")inp.focus()});
+  const go=s=>{setTimeout(()=>location.hash=s,250);return "Abriendo "+s+" ..."};
+  const R={
+    help:()=>"Comandos disponibles:\n  sobre-mi | proyectos | informes | experiencia | formacion | skills | contacto\n  whoami · id · ls · cat &lt;fichero&gt; · nmap · ask &lt;tema&gt; · cv\n  submit flag{...}   entrega una flag ("+found.size+"/"+FLAGS.size+")\n  clear              limpia la terminal",
+    whoami:()=>"josep — Pentester / Red Team Junior · CEH · doble máster en ciberseguridad",
+    id:()=>"uid=1337(josep) gid=1337(redteam) groups=1337(redteam),27(sudo?),42(ctf),445(smb),88(kerberos)",
+    ls:()=>"sobre_mi.txt  proyectos/  informes/  formacion.txt  contacto.sh  flag.txt",
+    "ls -a":()=>".  ..  .bash_history  .ssh/  sobre_mi.txt  proyectos/  informes/  flag.txt",
+    "ls -la":()=>"drwxr-xr-x  josep  .\n-rw-------  josep  .bash_history\ndrwx------  josep  .ssh/\n-rw-r--r--  josep  sobre_mi.txt\n-rw-r--r--  josep  flag.txt\ndrwxr-xr-x  josep  informes/",
+    "cat flag.txt":()=>"flag{recruiter_detectado_hablemos}",
+    "cat sobre_mi.txt":()=>D.about[0],
+    "cat .bash_history":()=>"nmap -sC -sV -p- 10.10.10.0/24\nnxc smb 10.10.10.10 -u usuarios.txt -p rockyou.txt\nbloodhound-python -d lab.local -c All\ncat .ssh/id_rsa   # pista ;)",
+    "cat .ssh/id_rsa":()=>"-----BEGIN NOT-A-REAL-KEY-----\nZmxhZ3tyb290X2VuX2VsX3BvcnRhZm9saW99\n-----END NOT-A-REAL-KEY-----\n(pista: base64 -d <cadena>)",
+    nmap:()=>"Starting Nmap 7.95\nPORT     STATE SERVICE\n22/tcp   open  ssh        (pentesting)\n88/tcp   open  kerberos   (active directory)\n389/tcp  open  ldap       (enumeración)\n445/tcp  open  smb        (movimiento lateral)\n1337/tcp open  hire-me    → escribe: contacto\nNmap done: 1 IP address (1 host up)",
+    cv:()=>`CV: <a href="${D.cv}" target="_blank" rel="noopener">${D.cv}</a>`,
+    github:()=>ext(D.gh),linkedin:()=>ext(D.li)
+  };
+  const ASK={
+    stack:"Kali, Nmap, Metasploit, Burp Suite, NetExec, Impacket, BloodHound, sqlmap, Wireshark, Nessus. Scripting en Python, Bash y PowerShell.",
+    ad:"Enumeración de SMB, LDAP, Kerberos y DNS, abuso de permisos y cuentas de servicio, y documentación de rutas hacia Domain Admin.",
+    certs:"CEH, Cisco CCST Cybersecurity, Hackviser CCF, IT Specialist Cybersecurity (Certiport) e Introduction to Cybersecurity (Cisco).",
+    disponibilidad:"Disponible para puestos de Pentester / Red Team Junior en España o en remoto.",
+    idiomas:"Español y catalán nativos, inglés B2.",
+    etica:"Solo ataco con autorización por escrito y dentro del alcance acordado. Sin excepciones."
+  };
+  inp.addEventListener("keydown",ev=>{
+    if(ev.key==="Enter"){run();return}
+    if(ev.key==="ArrowUp"&&hist.length){ev.preventDefault();hi=Math.min(hi+1,hist.length-1);inp.value=hist[hist.length-1-hi]}
+    else if(ev.key==="ArrowDown"){ev.preventDefault();hi=Math.max(hi-1,-1);inp.value=hi<0?"":hist[hist.length-1-hi]}
+  });
+  function run(){
+    const raw=inp.value.trim().replace(/\s+/g," "),q=raw.toLowerCase();
+    inp.value="";hi=-1;if(raw)hist.push(raw);
+    if(q==="clear"){out.innerHTML="";return}
+    let r="";
+    if(!q)r="";
+    else if(R[q])r=R[q]();
+    else if(V[q.replace(/^cd /,"")]&&q!=="inicio")r=go(q.replace(/^cd /,""));
+    else if(q==="formación")r=go("formacion");
+    else if(q==="ask")r="Temas: "+Object.keys(ASK).join(", ")+"\nEjemplo: ask ad";
+    else if(q.startsWith("ask ")){const k=q.slice(4).trim().replace("é","e");r=ASK[k]?esc(ASK[k]):"Tema desconocido. Prueba: "+Object.keys(ASK).join(", ")}
+    else if(q.startsWith("cat "))r=`<span class="e">cat: ${esc(raw.slice(4))}: No existe el fichero o el directorio</span>`;
+    else if(q.startsWith("base64 -d ")){try{r=esc(atob(raw.slice(10).trim()))}catch(e){r='<span class="e">base64: entrada no válida</span>'}}
+    else if(q.startsWith("submit ")){const f=raw.slice(7).trim();if(FLAGS.has(f)){found.add(f);r=`<span class="g">¡Flag aceptada! (${found.size}/${FLAGS.size})</span>`+(found.size===FLAGS.size?" Has hecho root en mi portafolio. Hablemos: "+ext(D.li,"LinkedIn"):"")}else r='<span class="e">Flag incorrecta. Sigue enumerando.</span>'}
+    else if(q.startsWith("sudo"))r='<span class="e">josep no está en el fichero sudoers. Este incidente será reportado... al equipo de Blue Team.</span>';
+    else if(q.startsWith("rm "))r='<span class="e">Operación no permitida: fuera del alcance (scope) acordado.</span>';
+    else r=`<span class="e">${esc(q)}: comando no encontrado.</span> Escribe help`;
+    out.innerHTML+="\n<span class=\"g\">root@redteam:~#</span> "+esc(raw)+(r?"\n"+r:"");
+    term.scrollTop=term.scrollHeight;
+  }
+}
+function boot(force){
+  let seen=false;try{seen=sessionStorage.getItem("booted")==="1"}catch(e){}
+  if(!force&&(seen||matchMedia("(prefers-reduced-motion:reduce)").matches)){show();return}
+  const L=["[ REDTEAM-OS v6.6 ] (C) 2026 Josep Sanz","Estableciendo túnel VPN (tun0)... <span class=\"k\">OK</span>","Comprobando autorización y alcance (RoE)... <span class=\"k\">OK</span>","Cargando nmap, impacket, bloodhound... <span class=\"k\">OK</span>","Montando /labs (DMZ, Web, Nexora)... <span class=\"k\">OK</span>","Iniciando sesión como josep..."];
+  scr.innerHTML='<pre class="boot" id="bl"></pre><p class="muted" style="margin-top:16px">Pulsa cualquier tecla o haz clic para saltar...</p>';
+  const bl=document.getElementById("bl");let i=0,done=false,t;
+  const end=()=>{if(done)return;done=true;clearTimeout(t);removeEventListener("keydown",end);scr.removeEventListener("click",end);try{sessionStorage.setItem("booted","1")}catch(e){}show()};
+  const step=()=>{if(done)return;if(i<L.length){bl.innerHTML+=(i?"\n":"")+L[i++];t=setTimeout(step,330)}else t=setTimeout(end,450)};
+  addEventListener("keydown",end);scr.addEventListener("click",end);step();
+}
+addEventListener("hashchange",show);
+const cv=document.getElementById("rain"),cx=cv.getContext("2d");
+const CH="アカサタナハマヤラワ0123456789ABCDEF<>/$#{}[]=;:";
+let cols=[],fs=16;
+const size=()=>{cv.width=innerWidth;cv.height=innerHeight;cols=Array(Math.ceil(cv.width/fs)).fill(0).map(()=>Math.random()*-60)};
+size();addEventListener("resize",size);
+const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const frame=()=>{cx.fillStyle="rgba(4,2,3,.12)";cx.fillRect(0,0,cv.width,cv.height);cx.font=fs+"px monospace";
+  cols.forEach((y,i)=>{const c=CH[Math.random()*CH.length|0];cx.fillStyle=Math.random()<.04?"#ffd0d4":"#d8102a";cx.fillText(c,i*fs,y*fs);cols[i]=y*fs>cv.height&&Math.random()>.975?0:y+1})};
+if(still){for(let k=0;k<80;k++)frame()}else setInterval(frame,55);
+console.log("%c >_ JOSEP_OS ","background:#141013;color:#ff4b4e;font-size:16px;font-weight:bold;padding:6px 10px;border:2px solid #ff4b4e");
+console.log("%c¿Revisando el código? Bien hecho: es el primer paso de cualquier pentest. Prueba 'ls -la' en la terminal y entrega las flags con 'submit flag{...}'.","color:#a39a95;font-family:monospace");
+boot(false);
+}
+</script>
+</body>
+</html>
